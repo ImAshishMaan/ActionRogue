@@ -23,10 +23,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereComp;
 
-	UPROPERTY(VisibleAnyWhere)
+	UPROPERTY(VisibleAnywhere)
 	UProjectileMovementComponent* MovementComp;
 
-	UPROPERTY(VisibleAnyWhere)
+	UPROPERTY(VisibleAnywhere)
 	UParticleSystemComponent* EffectComp;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
