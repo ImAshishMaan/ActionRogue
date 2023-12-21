@@ -25,8 +25,7 @@ ASItemChest::ASItemChest()
 
 void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Debug String: %s"), *"interface called22");
-	LidMesh->AddRelativeRotation(FRotator(TargetPitch, 0, 0));
+	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
 }
 
 // Called when the game starts or when spawned

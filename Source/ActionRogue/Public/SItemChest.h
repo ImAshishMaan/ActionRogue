@@ -17,6 +17,7 @@ class ACTIONROGUE_API ASItemChest : public AActor, public ISGameplayInterface
 public:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
+
 	void Interact_Implementation(APawn* InstigatorPawn);
 
 protected:
@@ -26,7 +27,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BaseMesh;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	UStaticMeshComponent* LidMesh;
 
 public:	
