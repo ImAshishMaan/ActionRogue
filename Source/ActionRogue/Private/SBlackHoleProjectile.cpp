@@ -22,16 +22,16 @@ ASBlackHoleProjectile::ASBlackHoleProjectile()
 
 void ASBlackHoleProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    {
-        // Check if the owner of the overlapped component is a StaticMeshActor
-        AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(OtherComp->GetOwner());
-        if (StaticMeshActor)
-        {
-            // Check if the actor is still valid before destroying it
-            if (StaticMeshActor && StaticMeshActor->IsValidLowLevelFast())
-            {
-                StaticMeshActor->Destroy();
-            }
-        }
-    }
+    //{
+    //    // Check if the owner of the overlapped component is a StaticMeshActor
+    //    AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(OtherComp->GetOwner());
+    //    if (StaticMeshActor)
+    //    {
+    //        // Check if the actor is still valid before destroying it
+    //        if (StaticMeshActor && StaticMeshActor->IsValidLowLevelFast())
+    //        {
+    //            StaticMeshActor->Destroy();
+    //        }
+    //    }
+    //}
 }
