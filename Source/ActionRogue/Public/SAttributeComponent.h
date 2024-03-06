@@ -8,25 +8,27 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ACTIONROGUE_API USAttributeComponent : public UActorComponent
-{
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class ACTIONROGUE_API USAttributeComponent : public UActorComponent {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static USAttributeComponent* GetAttributes(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
+
 	USAttributeComponent();
 
 protected:
-
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float Health;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float HealthMax;
 
-public:	
-
+public:
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 
@@ -40,6 +42,6 @@ public:
 	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
-	bool ApplyHealthChange(float Delta);
-		
+	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
+
 };

@@ -20,6 +20,9 @@ public:
 
 protected:
 
+	UFUNCTION()
+	void SetTargetActor(AActor* NewTarget);
+
 	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
