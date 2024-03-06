@@ -20,6 +20,9 @@ public:
 
 protected:
 
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+
 	UFUNCTION()
 	void SetTargetActor(AActor* NewTarget);
 

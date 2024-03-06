@@ -15,6 +15,8 @@ ASAICharacter::ASAICharacter() {
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	TimeToHitParamName = "TimeToHit";
 }
 
 void ASAICharacter::PostInitializeComponents() {
@@ -26,6 +28,10 @@ void ASAICharacter::PostInitializeComponents() {
 
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta) {
 	if(Delta < 0.0f) {
+		
+		if(Delta < 0.0f) {
+			GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+		}
 		if(InstigatorActor != this) {
 			SetTargetActor(InstigatorActor);
 		}
