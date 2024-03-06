@@ -7,6 +7,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "SAttributeComponent.h"
 #include "BrainComponent.h"
+#include "SWorldUserWidget.h"
+#include "Blueprint/UserWidget.h"
 
 
 // Sets default values
@@ -28,12 +30,18 @@ void ASAICharacter::PostInitializeComponents() {
 
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta) {
 	if(Delta < 0.0f) {
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 		
-		if(Delta < 0.0f) {
-			GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
-		}
 		if(InstigatorActor != this) {
 			SetTargetActor(InstigatorActor);
+		}
+
+		if(ActiveHealthBar == nullptr) {
+			ActiveHealthBar = CreateWidget<USWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+			if(ActiveHealthBar) {
+				ActiveHealthBar->AttachedActor = this;
+				ActiveHealthBar->AddToViewport();
+			}
 		}
 		
 		if(NewHealth <= 0) {
