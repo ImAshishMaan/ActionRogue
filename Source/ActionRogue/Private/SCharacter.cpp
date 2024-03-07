@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SCharacter.h"
+#include "SActionComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -9,11 +7,7 @@
 #include "SAttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-
-// Sets default values
-ASCharacter::ASCharacter()
-{
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ASCharacter::ASCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
@@ -27,6 +21,8 @@ ASCharacter::ASCharacter()
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
@@ -37,8 +33,7 @@ ASCharacter::ASCharacter()
 }
 
 
-void ASCharacter::PostInitializeComponents()
-{
+void ASCharacter::PostInitializeComponents() {
 	Super::PostInitializeComponents();
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
@@ -49,8 +44,7 @@ FVector ASCharacter::GetPawnViewLocation() const {
 
 
 // Called to bind functionality to input
-void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
+void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASCharacter::MoveForward);
@@ -68,14 +62,16 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::Dash);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
 }
 
 void ASCharacter::HealSelf(float Amount /* = 100 */) {
 	AttributeComp->ApplyHealthChange(this, Amount);
 }
 
-void ASCharacter::MoveForward(float Value)
-{
+void ASCharacter::MoveForward(float Value) {
 	FRotator ControlRot = GetControlRotation();
 	ControlRot.Pitch = 0.0f;
 	ControlRot.Roll = 0.0f;
@@ -83,8 +79,7 @@ void ASCharacter::MoveForward(float Value)
 	AddMovementInput(ControlRot.Vector(), Value);
 }
 
-void ASCharacter::MoveRight(float Value)
-{
+void ASCharacter::MoveRight(float Value) {
 	FRotator ControlRot = GetControlRotation();
 	ControlRot.Pitch = 0.0f;
 	ControlRot.Roll = 0.0f;
@@ -98,64 +93,59 @@ void ASCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
-void ASCharacter::PrimaryAttack()
-{
+void ASCharacter::SprintStart() {
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void ASCharacter::SprintStop() {
+	ActionComp->StopActionByName(this, "Sprint");
+}
+
+void ASCharacter::PrimaryAttack() {
 	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
-	
 }
 
-void ASCharacter::BlackHoleAttack()
-{
+void ASCharacter::BlackHoleAttack() {
 	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElapsed, AttackAnimDelay);
 }
 
 
-void ASCharacter::BlackholeAttack_TimeElapsed()
-{
+void ASCharacter::BlackholeAttack_TimeElapsed() {
 	SpawnProjectile(BlackHoleProjectileClass);
 }
 
 
-void ASCharacter::Dash()
-{
+void ASCharacter::Dash() {
 	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASCharacter::Dash_TimeElapsed, AttackAnimDelay);
 }
 
-void ASCharacter::StartAttackEffects()
-{
+void ASCharacter::StartAttackEffects() {
 	PlayAnimMontage(AttackAnim);
 
 	UGameplayStatics::SpawnEmitterAttached(CastingEffect, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 }
 
-void ASCharacter::Dash_TimeElapsed()
-{
+void ASCharacter::Dash_TimeElapsed() {
 	SpawnProjectile(DashProjectileClass);
 }
 
 
-
-void ASCharacter::PrimaryInteract()
-{
-	//UE_LOG(LogTemp, Warning, TEXT("Debug String: %s"), *"interface called11");
+void ASCharacter::PrimaryInteract() {
 	InteractionComp->PrimaryInteract();
 }
 
-void ASCharacter::PrimaryAttack_TimeElapsed()
-{
+void ASCharacter::PrimaryAttack_TimeElapsed() {
 	SpawnProjectile(ProjectileClass);
 }
 
-void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
-{
-	if (ensureAlways(ClassToSpawn))
-	{
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn) {
+	if(ensureAlways(ClassToSpawn)) {
 		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		FActorSpawnParameters SpawnParams;
@@ -181,13 +171,10 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 
 		FRotator ProjRotation;
 		// true if we got to a blocking hit (Alternative: SweepSingleByChannel with ECC_WorldDynamic)
-		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
-		{
+		if(GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params)) {
 			// Adjust location to end up at crosshair look-at
 			ProjRotation = FRotationMatrix::MakeFromX(Hit.ImpactPoint - HandLocation).Rotator();
-		}
-		else
-		{
+		} else {
 			// Fall-back since we failed to find any blocking hit
 			ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
 		}
@@ -198,15 +185,11 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 	}
 }
 
-void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
-{
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta) {
 	if(Delta < 0.0f) {
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 	}
-	if (NewHealth <= 0.0f && Delta < 0.0f) {
+	if(NewHealth <= 0.0f && Delta < 0.0f) {
 		DisableInput(Cast<APlayerController>(GetController()));
 	}
-	
 }
-
-
