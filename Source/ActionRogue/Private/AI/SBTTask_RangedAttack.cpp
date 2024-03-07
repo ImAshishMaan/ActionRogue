@@ -1,8 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AI/SBTTask_RangedAttack.h"
-
 #include "SAttributeComponent.h"
 #include "AIModule/Classes/AIController.h"
 #include "GameFramework/Character.h"
