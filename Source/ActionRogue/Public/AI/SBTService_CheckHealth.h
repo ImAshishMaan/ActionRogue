@@ -2,17 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTService.h"
-#include "SBTService_CheckAttackRange.generated.h"
+#include "SBTService_CheckHealth.generated.h"
 
 UCLASS()
-class ACTIONROGUE_API USBTService_CheckAttackRange : public UBTService
+class ACTIONROGUE_API USBTService_CheckHealth : public UBTService
 {
 	GENERATED_BODY()
-	
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-	FBlackboardKeySelector AttackRangeKey;
+	FBlackboardKeySelector LowHealthKey;
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+	
 };

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SAttributeComponent.h"
 
 USAttributeComponent::USAttributeComponent() {
@@ -18,6 +15,10 @@ bool USAttributeComponent::IsAlive() const {
 
 bool USAttributeComponent::IsFullHealth() const {
 	return Health == HealthMax;
+}
+
+bool USAttributeComponent::IsLowHealth() {
+	return Health < 40;
 }
 
 
