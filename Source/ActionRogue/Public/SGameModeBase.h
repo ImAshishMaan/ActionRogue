@@ -44,5 +44,6 @@ public:
 
 	virtual void StartPlay() override;
 
-
+	UFUNCTION(Exec)
+	void KillAll();
 };

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AI/SAICharacter.h"
 #include "Perception/PawnSensingComponent.h"
 #include "AIController.h"
@@ -10,8 +7,6 @@
 #include "SWorldUserWidget.h"
 #include "Blueprint/UserWidget.h"
 
-
-// Sets default values
 ASAICharacter::ASAICharacter() {
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
