@@ -15,8 +15,6 @@ class ACTIONROGUE_API USInteractionComponent : public UActorComponent
 public:
 	void PrimaryInteract();
 
-public:	
-	// Sets default values for this component's properties
 	USInteractionComponent();
 
 protected:

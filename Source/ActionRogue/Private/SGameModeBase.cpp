@@ -6,45 +6,43 @@
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
 #include "SCharacter.h"
+#include "SPlayerState.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
-ASGameModeBase::ASGameModeBase()
-{
+ASGameModeBase::ASGameModeBase() {
 	SpawnTimerInterval = 2.0f;
+	CreditsPerKill = 20;
 }
 
-void ASGameModeBase::StartPlay()
-{
+void ASGameModeBase::StartPlay() {
 	Super::StartPlay();
-
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
 
 void ASGameModeBase::KillAll() {
-	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It) {
+	for(TActorIterator<ASAICharacter> It(GetWorld()); It; ++It) {
 		ASAICharacter* Bot = *It;
 
 		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
-		if (ensure(AttributeComp) && AttributeComp->IsAlive()) {
+		if(ensure(AttributeComp) && AttributeComp->IsAlive()) {
 			AttributeComp->Kill(this);
 		}
 	}
 }
 
-void ASGameModeBase::SpawnBotTimerElapsed()
-{
-	if(!CVarSpawnBots.GetValueOnGameThread()){
+void ASGameModeBase::SpawnBotTimerElapsed() {
+	if(!CVarSpawnBots.GetValueOnGameThread()) {
 		UE_LOG(LogTemp, Log, TEXT("Bot spawning disabled via cvar 'CVarSpawnBots'."));
 		return;
 	}
 	int32 NrOfAliveBots = 0;
-	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It) {
+	for(TActorIterator<ASAICharacter> It(GetWorld()); It; ++It) {
 		ASAICharacter* Bot = *It;
 
 		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
-		if (ensure(AttributeComp) && AttributeComp->IsAlive()) {
+		if(ensure(AttributeComp) && AttributeComp->IsAlive()) {
 			NrOfAliveBots;
 		}
 	}
@@ -52,44 +50,40 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 
 	float MaxBotcount = 10.0f;
 
-	if (DifficultyCurve) {
+	if(DifficultyCurve) {
 		MaxBotcount = DifficultyCurve->GetFloatValue(GetWorld()->TimeSeconds);
 	}
-	if (NrOfAliveBots >= MaxBotcount) {
+	if(NrOfAliveBots >= MaxBotcount) {
 		UE_LOG(LogTemp, Warning, TEXT("At maximum bot capacity. Skipping bot spawn"));
 		return;
 	}
 
 	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 
-	if (ensure(QueryInstance)) {
+	if(ensure(QueryInstance)) {
 		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);
 	}
-
-
 }
 
-void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
-{
-	if (QueryStatus != EEnvQueryStatus::Success) {
+void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus) {
+	if(QueryStatus != EEnvQueryStatus::Success) {
 		UE_LOG(LogTemp, Warning, TEXT("Spawn bot EQS Query Failed!"));
 		return;
 	}
 
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 	FVector error = FVector(0, 0, 100); // because my Landscape is at 100z
-	if (Locations.Num() > 0) {
+	if(Locations.Num() > 0) {
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0] + error, FRotator::ZeroRotator);
 
 		DrawDebugSphere(GetWorld(), Locations[0] + error, 50.0f, 20, FColor::Blue, false, 60.0f);
 	}
-
 }
 
 void ASGameModeBase::RespawnPlayerElapsed(AController* Controller) {
 	if(ensure(Controller)) {
 		Controller->UnPossess();
-		
+
 		RestartPlayer(Controller);
 	}
 }
@@ -101,10 +95,19 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer) {
 
 		FTimerDelegate Delegate;
 		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
-		
+
 		float RespawnDelay = 2.0f;
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
 	}
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
-}
 
+	APawn* KillerPawn = Cast<APawn>(Killer);
+	if(KillerPawn) {
+		ASPlayerState* PS = KillerPawn->GetPlayerState<ASPlayerState>();
+		if(PS) {
+			PS->AddCredits(CreditsPerKill);
+		}else {
+			UE_LOG(LogTemp, Warning, TEXT("PS IS NULL"));
+		}
+	}
+}

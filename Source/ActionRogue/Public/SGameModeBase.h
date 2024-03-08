@@ -10,12 +10,10 @@ class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
 
 UCLASS()
-class ACTIONROGUE_API ASGameModeBase : public AGameModeBase
-{
+class ACTIONROGUE_API ASGameModeBase : public AGameModeBase {
 	GENERATED_BODY()
 
 protected:
-
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TSubclassOf<AActor> MinionClass;
 
@@ -30,6 +28,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
 
+	// Read/write access as we could change this as our difficulty increases via Blueprint
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
+	int32 CreditsPerKill;
+
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
 
@@ -38,9 +40,8 @@ protected:
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
-	
-public:
 
+public:
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 
 	ASGameModeBase();
