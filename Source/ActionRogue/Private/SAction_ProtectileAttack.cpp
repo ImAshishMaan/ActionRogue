@@ -24,7 +24,6 @@ void USAction_ProtectileAttack::StartAction_Implementation(AActor* Instigator) {
 }
 
 void USAction_ProtectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharacter) {
-	ACharacter* Character = Cast<ACharacter>(InstigatorCharacter);
 	if(ensureAlways(ProjectileClass)) {
 		FVector HandLocation = InstigatorCharacter->GetMesh()->GetSocketLocation(HandSocketName);
 
@@ -58,7 +57,6 @@ void USAction_ProtectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharac
 			// Fall-back since we failed to find any blocking hit
 			ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
 		}
-
 
 		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
