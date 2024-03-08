@@ -9,8 +9,6 @@ class ACTIONROGUE_API ASPowerup_Credits : public ASPowerupActor {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditAnywhere, Category = "Credits")
 	int32 CreditsAmount;

@@ -16,13 +16,13 @@ protected:
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "PlayerState|Credits")
+	UFUNCTION(BlueprintCallable, Category = "Credits")
 	void AddCredits(int32 Delta);
 	
-	UFUNCTION(BlueprintCallable, Category = "PlayerState|Credits")
+	UFUNCTION(BlueprintCallable, Category = "Credits")
 	bool RemoveCredits(int32 Delta);
 
-	UFUNCTION(BlueprintCallable, Category = "PlayerState|Credits")
+	UFUNCTION(BlueprintCallable, Category = "Credits")
 	int32 GetCurrentCredits() const;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")

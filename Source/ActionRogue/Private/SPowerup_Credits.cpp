@@ -2,10 +2,7 @@
 #include "SPlayerState.h"
 
 ASPowerup_Credits::ASPowerup_Credits() {
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
-	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComp->SetupAttachment(RootComponent);
-
+	
 	CreditsAmount = 80;
 }
 
