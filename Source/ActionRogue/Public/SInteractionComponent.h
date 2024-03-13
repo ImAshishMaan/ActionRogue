@@ -11,6 +11,9 @@ class ACTIONROGUE_API USInteractionComponent : public UActorComponent {
 	GENERATED_BODY()
 
 protected:
+	
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* InFocus);
 
 	void FindBestInteractable();
 	
